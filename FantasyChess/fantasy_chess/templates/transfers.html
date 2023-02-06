@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='transfer.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+    </script>
+{% endblock %}
+
+<script>
+    var user_balance = {{balance}};
+    var otb_team = {{online_team_ids}};
+    var online_team = {{otb_team_ids}};
+
+    function transfer_online (player_id, cost) {
+        //Checks that you don't already have this player on the team
+        if (!(online_team.includes(id) || otb_team.includes(id))) {
+            return false
+            //Notify the user of their duplicate
+        };
+
+        //Checks if the user can afford the transaction
+        if ((user_balance - cost < 0)) {
+            return false
+        };
+
+        //Checks if there is any space to insert a player, i.e they have not already selected their three players for the online team
+        if (online_team.indexOf(0)==-1) {
+            return false
+        };
+
+        let placement = online_team.indexOf(0);
+        online_team[placement] = id;
+        user_balance = user_balance - document.getElementById('cost_' + player_id).innerText;
+        //Change the online_team slot to match the player selected from the carousel
+        document.getElementById(placement + 'name').innerHTML = document.getElementById('name_' + player_id).innerText;
+        document.getElementById(placement + 'rating').innerHTML = document.getElementById('rating_' + player_id).innerText;
+        document.getElementById(placement + 'cost').innerHTML = document.getElementById('cost_' + player_id).innerText;
+    };
+
+    function transfer_otb (player_id, cost) {
+        //Checks that you don't already have this player on the team
+        if (!(online_team.includes(id) || otb_team.includes(id))) {
+            return false
+            //Notify the user of their duplicate
+        };
+
+        //Checks if the user can afford the transaction
+        if ((user_balance - cost < 0)) {
+            return false
+        };
+
+        //Checks if there is any space to insert a player, i.e they have not already selected their three players for the online team
+        if (otb_team.indexOf(0)==-1) {
+            return false
+        };
+
+        let placement = otb_team.indexOf(0);
+        otb_team[placement] = id;
+        user_balance = user_balance - document.getElementById('cost_' + player_id).innerText;
+        //Change the online_team slot to match the player selected from the carousel
+        document.getElementById(placement + 'name2').innerHTML = document.getElementById('name_' + player_id).innerText;
+        document.getElementById(placement + 'rating2').innerHTML = document.getElementById('rating_' + player_id).innerText;
+        document.getElementById(placement + 'cost2').innerHTML = document.getElementById('cost_' + player_id).innerText;
+    };
+
+
+    function remove_player_online(loop_index) {
+        //Checks that the slot isn't empty
+        if (online_team[loop_index] == 0){
+            return false
+        }
+        online_team[loop_index] = 0;
+        user_balance = user_balance + document.getElementById(loop_index + 'cost').innerText;
+        document.getElementById(loop_index + 'name').innerHTML = 'Name';
+        document.getElementById(loop_index + 'rating').innerHTML = 'Unknown';
+        document.getElementById(loop_index + 'cost').innerHTML = 'Unknown';
+
+    }
+
+    function remove_player_otb(loop_index) {
+        //Checks that the slot isn't empty
+        if (otb_team[loop_index] == 0){
+            return false
+        }
+        otb_team[loop_index] = 0;
+        user_balance = user_balance + document.getElementById(loop_index + 'cost').innerText;
+        document.getElementById(loop_index + 'name2').innerHTML = 'Name';
+        document.getElementById(loop_index + 'rating2').innerHTML = 'Unknown';
+        document.getElementById(loop_index + 'cost2').innerHTML = 'Unknown';
+
+    }
+
+    function save_team() {
+        if ((online_team.includes(0) || otb_team.includes(0))) {
+            return false
+            //Notify the user of their duplicate
+        };
+        teams = {'otb' : otb_team, 'online' : online_team, 'user_balance': user_balance};
+        $.ajax({
+        type: "POST",
+        url: "/process_qtc",
+        data: JSON.stringify(teams),
+        contentType: "application/json",
+        dataType: 'json' 
+    });
+
+    };
+
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+{% block content %}
+<div class="otb_team_container">
+    {% for player in otb_team %}
+        <div class="chessboard_square" onclick="remove_player_otb({{loop.index}})">
+            <p class="player_statistic name" id="{{loop.index}}name2"> {{player.player.name}}</p>
+            <picture><img></picture>
+            <p class="'player_statistic rating" id="{{loop.index}}rating2"> {{player.player.rating}} </p>
+            <p class="player_statistic cost" id="{{loop.index}}cost2"> {{player.player.cost}} </p>
+        </div>
+    {% endfor %}
+</div>
+<div class="'online_team_container">
+    {% for player in otb_team %}
+        <div class="chessboard_square" onclick="remove_player_online({{loop.index}})">
+            <p class="player_statistic name" id="{{loop.index}}name"> {{player.player.name}} </p>
+            <picture><img></picture>
+            <p class="'player_statistic rating" id="{{loop.index}}rating"> {{player.player.rating}} </p>
+            <p class="player_statistic cost" id="{{loop.index}}cost"> {{player.player.cost}} </p>
+        </div>
+    {% endfor %}
+</div>
+
+<table class="player_carousel_otb">
+    {% for player in players %}
+        <tr onclick="transfer_otb({{player.id}}, {{player.cost}})">
+            <th id="name_{{player.id}}">{{player.name}}</th>
+            <th id="cost_{{player.id}}">{{player.cost}}</th>
+            <th id="rating_{{player.id}}">{{player.rating}}</th>
+        </tr>
+    {% endfor %}
+</table>
+
+<table class="player_carousel_online">
+    {% for player in players %}
+        <tr onclick="transfer_online({{player.id}}, {{player.cost}})">
+            <th>{{player.name}}</th>
+            <th>{{player.cost}}</th>
+            <th>{{player.rating}}</th>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

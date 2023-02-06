@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='my_points.css') }}">
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+Tournament Name:
+{{tournamet.title}}
+
+{{tournamet.end}}
+
+<!-- Consider Player stats here, like highest score etc. -->
+Link to paid league
+{{tournament.league.id}} <!-- -->
+
+total_score: {% online_team.points if tournament.statud=='online' else otb_team.points %}
+
+
+
+{% for player in online_team.players %}
+player.player.name
+{{player.points}}
+{% if player.captain %}
+Captain 
+{% endif %}
+{$ endfor %}
+
+{% for player in otb_team.players %}
+player.player.name
+{{player.points}}
+{% if player.captain %}
+Captain 
+{% endif %}
+{$ endfor %}
