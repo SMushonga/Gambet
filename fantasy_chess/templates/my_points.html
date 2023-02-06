@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='my_points.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <section>
+        <h1 id="team_name">{{current_user.teamname}}</h1>
+        <section id="tournament_info">
+            <h2 id="tournament_name">{{tournament.title}}</h2>
+            <h2 id="tournament_end">{{tournament.end}}</h2>
+            <h3> Join the Paid League </h3>
+            <a href="{{url_for('league', league_id=tournament.league.id)}}">Paid League</a>
+            <h3>Your score:</h3>
+            {% if tournament.status == 'online' %}
+                {{online_team.points}}
+            {% elif tournament.status == 'otb' %}
+                {{otb_team.points}}
+            {% else %}
+                0
+            {% endif %}
+        </section>
+        <section id="team_container">
+            <div id="team_type_titles">
+                <h2 class="team_type_title" id="otb_title">OTB</h2>
+                <h2 class="team_type_title" id="online_title">online</h2>
+            </div>
+            <!--Remember to indicate which team actually played in this tournament, otb or online-->
+            <div class='team' id="otb_row">
+                {% for player_otb in otb_team.players %}
+                    <div>
+                        {% if player.captain %}
+                        <button id='{{player_online.player_id}}' class='captain_button'>C</button>
+                        {% endif %}
+                        <p>{{player_otb.player.name}}</p>
+                        <p>{{player_otb.player.rating}}</p>
+                        <p>{{player_otb.points}}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class='team' id="online_row">
+                {% for player_online in online_team.players %}
+                    <div>
+                        {% if player.captain %}
+                        <button id="{{player_online.player_id}}" class='captain_button'>C</button>
+                        {% endif %}
+                        <p class="player_info">{{player_online.player.name}}</p>
+                        <p class="player_info">{{player_online.player.rating}}</p>
+                        <p class="player_info">{{player_online.points}}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+    <aside>
+        <table class="Information_table" id="Leagues">
+            {% for user_league in user_leagues %}
+            <tr>
+                <th>{{user_league.league.title}}</th>
+                <th>{{user_league.position}}</th>
+            </tr>
+            {% endfor %}
+        </table>
+        <table class="Information_table" id="Prizes">
+            <tr>
+                <th class="table_heading">Tournament Prizes</th>
+            </tr>
+            {% if prizes %}
+                {% for prize in prizes %}
+                <tr>
+                    <!--Consider linking to the league that the prize is associated with-->
+                    <!--Consider linking to the team of the person-->
+                    <th>{{prize.title}}</th>
+                    <th>{{prize.value}}</th>
+                    <th>{{prize.winner.teamname}}</th>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+    </aside>
+</main>
+
+{% endblock %}

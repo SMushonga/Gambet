@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='create_league.css') }}">
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    {{ form.csrf_token }}
+    <div>
+        {{ form.league_name.label(class="form_label") }}
+        {% if form.league_name.errors %}
+            {{ form.league_name(class="form_field_error") }}
+            <div class="invalid-feedback">
+                {% for error in form.league_name.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.league_name(class="form_field") }}
+        {% endif %}
+    </div>
+    <div>
+        {{ form.league_start.label(class="form_label") }}
+        {% if form.league_start.errors %}
+            {{ form.league_start(class="form_field_error") }}
+            <div class="invalid-feedback">
+                {% for error in form.league_start.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.league_start(class="form_field") }}
+        {% endif %}
+    </div>
+    <div>
+        {{ form.league_end.label(class="form_label") }}
+        {% if form.league_end.errors %}
+            {{ form.league_end(class="form_field_error") }}
+            <div class="invalid-feedback">
+                {% for error in form.league_end.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.league_end(class="form_field") }}
+        {% endif %}
+    </div>
+    <div>
+        {{ form.league_type.label(class="form_label") }}
+        {% if form.league_type.errors %}
+            {{ form.league_type(class="form_field_error") }}
+            <div class="invalid-feedback">
+                {% for error in form.league_type.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.league_type(class="form_field") }}
+        {% endif %}
+    </div>
+    {{ form.submit(class="submit") }}
+</form>
+{% endblock %}
