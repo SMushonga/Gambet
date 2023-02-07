@@ -1,0 +1,145 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='my_team.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+    </script>
+ {% endblock %}
+
+ <script>
+    var captain_id = {captain: '{{captain_id}}'};
+    buttons = document.getElementsByClassName('captain_button')
+
+    function make_captain(player_id) {
+        for (let i = 0; i > buttons.length; i++) {
+            buttons[i].style.opacity = 0.1
+        };
+
+        captain_button = document.getElementById(player_id);
+        captain_button.style.opacity = 1;
+
+        captain_id[captain] = player_id;
+    }
+
+    make_captain(captain_id[captain])
+
+    function save_captain() {
+        $.ajax({
+        type: "POST",
+        url: "/process_qtc",
+        data: JSON.stringify(captain_id),
+        contentType: "application/json",
+        dataType: 'json',
+        //Here we want to implement a notification to tell the user it was successful, for now we log it
+        success: function(result) {
+        console.log("Result:");
+        console.log(result);
+    } 
+    });
+
+    };
+
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+
+
+{% block content %}
+
+<main>
+    <section>
+        <h1 id="team_name">{{current_user.teamname}}</h1>
+        <section id="team_container">
+            <div id="team_type_titles">
+                <h2 class="team_type_title" id="otb_title">OTB</h2>
+                <h2 class="team_type_title" id="online_title">online</h2>
+            </div>
+            <div class='team' id="otb_row">
+                {% for player_otb in otb_team.players %}
+                    <div>
+                        <button id='{{player_online.player_id}}' class='captain_button' onclick="make_captain('{{player_online.player_id}}')">C</button>
+                        <p>{{player_otb.player.name}}</p>
+                        <p>{{player_otb.player.rating}}</p>
+                        <p>{{player_otb.player.cost}}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class='team' id="online_row">
+                {% for player_online in online_team.players %}
+                    <div>
+                        <button id="{{player_online.player_id}}" class='captain_button' onclick="make_captain('{{player_online.player_id}}')">C</button>
+                        <p class="player_info">{{player_online.player.name}}</p>
+                        <p class="player_info">{{player_online.player.rating}}</p>
+                        <p class="player_info">{{player_online.player.cost}}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        <section>
+            <button onclick="save_captain()">Save Captain</button>
+            <table class="Information_table" id="Prizes">
+                <tr>
+                    <th class="table_heading">Prizes</th>
+                </tr>
+                {% if prizes %}
+                    {% for prize in prizes %}
+                    <tr>
+                        <!--Consider linking to the league that the prize is associated to-->
+                        <th>{{prize.title}}</th>
+                        <th>{{prize.value}}</th>
+                        <th>{{prize.date_awarded}}</th>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+            <table class="Information_table" id="Articles">
+                <tr>
+                    <th class="table_heading">News</th>
+                </tr>
+                {% for article in articles %}
+                <tr>
+                    <!--Consider linking to the league that the prize is associated to-->
+                    <th>{{article.title}}</th>
+                    <th>{{article.date_posted}}</th>
+                </tr>
+                {% endfor %}
+            </table>
+        </section>
+    </section>
+    <aside>
+        <table class="Information_table" id="Next_fixture">
+            <tr>
+                <th class="table_heading">Next Fixture:</th>
+            </tr>
+            <tr>
+                <th>Tournament</th>
+                <th>{{ next_fixture.title }}</th>
+            </tr>
+            <tr>
+                <th>Transfer Deadline</th>
+                <th>{{ next_fixture.transfer_deadline }}</th>
+            </tr>
+            <tr>
+                <th>Join the paid league</th>
+                <th><a href="{{url_for('league_page', league_id=next_fixture.league.id)}}">View League</a>
+            </tr>
+        </table>
+        <table class="Information_table" id="Leagues">
+            {% for user_league in user_leagues %}
+            <tr>
+                <th>{{user_league.league.title}}</th>
+                <th>{{user_league.position}}</th>
+            </tr>
+            {% endfor %}
+        </table>
+    </aside>
+</main>
+
+{% endblock %}

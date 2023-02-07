@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='insert_player_tournament.css') }}">
+{% endblock %}
+
+
+<script>
+    var players = [];
+
+    function transfer_online (player_id) {
+        //Checks that you don't already have this player on the team
+        if (players.includes(player_id)) {
+            return false
+            //Notify the user of their duplicate
+        };
+
+        players.push(player_id)
+        //Create a div that shows the selected player
+        
+    };
+
+    function remove_player_online(player_id) {
+        if (!(players.includes(player_id))) {
+            return false
+        };
+
+        let position = players.indexOf(player_id)
+        for( var i = 0; i < playeys.length; i++){ 
+    
+            if ( players[i] === players[position]) { 
+
+                players.splice(i, 1); 
+            }
+
+        }
+
+        //Remove the div
+        document.getElementById(loop_index + 'name').innerHTML = 'Name';
+        document.getElementById(loop_index + 'rating').innerHTML = 'Unknown';
+        document.getElementById(loop_index + 'cost').innerHTML = 'Unknown';
+
+    }
+
+    function save_team() {
+        if ((online_team.includes(0) || otb_team.includes(0))) {
+            return false
+            //Notify the user of their duplicate
+        };
+        teams = {'otb' : otb_team, 'online' : online_team, 'user_balance': user_balance};
+        $.ajax({
+        type: "POST",
+        url: "/process_qtc",
+        data: JSON.stringify(teams),
+        contentType: "application/json",
+        dataType: 'json' 
+    });
+
+    };
+
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+</script>
+{% block content %}
+
+<table class="player_carousel_otb">
+    {% for player in players %}
+        <tr onclick="transfer_otb({{player.id}}, {{player.cost}})">
+            <th id="name_{{player.id}}">{{player.name}}</th>
+            <th id="cost_{{player.id}}">{{player.cost}}</th>
+            <th id="rating_{{player.id}}">{{player.rating}}</th>
+        </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}

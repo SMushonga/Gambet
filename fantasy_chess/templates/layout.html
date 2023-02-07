@@ -1,0 +1,28 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <nav:>
+        <a href="{{url_for('teams.my_team')}}">My Team</a>
+        <a href="{{url_for('teams.my_team')}}">My Points</a>
+        <a href="{{url_for('teams.my_team')}}">Transfers</a>
+        <a href="{{url_for('teams.my_team')}}">Gambet</a>
+        <a href="{{url_for('teams.my_team')}}">News</a>
+        <a href="{{url_for('teams.my_team')}}">Contact Us</a>
+        <a href="{{url_for('teams.my_team')}}">Profile</a>
+    </nav:>
+    <!--Every flashed message is dealt with here-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}
+    {% endblock %}
+</body>

@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='tournament.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div>
+        <h1> {{tournament.title}} </h1>
+        <h1> {{tournament.start}} </h1>
+        <h1> {{tournament.end}} </h1>
+        <h1> {{tournament.tournament_type }} </h1>
+        <h1> {{tournament.status}} </h1>
+    </div>
+    <!--Here we might want to insert data such as favourite to win, if the tournament is already over maybe we prodive some post-tournament statistics -->
+    <div>
+        {% if tournament.league.prizes %}
+            {% for prize in tournament.league.prizes %}
+                {{prize.winner.teamname}}
+                {{prize.value}}
+                {{prize.title}}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div>
+        {% for player in tournament.players %}
+            {{player.player.name}}
+            {{player.player.rating}}
+        {% endfor %}
+    </div>
+
+    <div>
+        {% if tournament.status != 'finished' %}
+            <a href="{{url_for('league.league', league_id=tournament.league.id)">View the Paid League</a>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

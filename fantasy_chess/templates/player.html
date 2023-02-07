@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='player.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div>
+        <h1> {{player.name}} </h1>
+        <h1> {{player.rating}} </h1>
+        <h1> {{player.cost}} </h1>
+        <h1> {{player.birthdate }} </h1>
+        <!-- We want to add player age and link to chess.com and lichess profiles here-->
+        
+    </div>
+    <!--Here we might want to insert data such as ownership %, and odds to win next tournament based on elo-->
+</main>
+{% endblock %}
